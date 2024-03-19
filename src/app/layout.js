@@ -1,5 +1,7 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Navber from "@/component/Navber/Navber";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +13,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <link
+          href="https://cdn.jsdelivr.net/npm/daisyui@4.7.3/dist/full.min.css"
+          rel="stylesheet"
+          type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+      </head>
+      <body className={inter.className}>
+        <div className="max-w-7xl mx-auto">
+        {children}
+        </div>
+      </body>
     </html>
   );
 }
