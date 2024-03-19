@@ -3,7 +3,7 @@ import Link from "next/link";
 import axios from "axios";
 import { auth } from "@/app/firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 const Tasks = () => {
@@ -11,17 +11,6 @@ const Tasks = () => {
   const [user] = useAuthState(auth);
   console.log(user?.email);
 
-//   useEffect(() => {
-//     axios
-//       .get("https://job-task-xi.vercel.app/todo")
-//       .then((res) => {
-//         // console.log(res?.data);
-//         setAllTask(res?.data);
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//       });
-//   }, []);
   const { data, refetch } = useQuery({
     queryKey: ["todo"],
     queryFn: async () => {
@@ -108,15 +97,17 @@ const Tasks = () => {
   };
 
   return (
-    <div className="">
+    <div className="max-w-7xl mx-auto">
       {/* You can open the modal using document.getElementById('ID').showModal() method */}
       <div>
+        <div className="flex items-center justify-center pt-4">
         <button
-          className="btn"
+          className="btn btn-primary btn-sm"
           onClick={() => document.getElementById("my_modal_3").showModal()}
         >
-          open modal
+          Add Task
         </button>
+        </div>
         <dialog id="my_modal_3" className="modal">
           <div className="modal-box">
             <form method="dialog">
@@ -159,7 +150,6 @@ const Tasks = () => {
                       type="text"
                       name="description"
                       placeholder="Description"
-                      required
                       className="input input-bordered w-full "
                     />
                   </div>

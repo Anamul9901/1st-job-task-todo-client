@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         <script src="https://cdn.tailwindcss.com"></script>
       </head>
       <body className={inter.className}>
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <TanstackQueryClient>{children}</TanstackQueryClient>
         </div>
       </body>
