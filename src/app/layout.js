@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-sync-scripts */
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navber from "@/component/Navber/Navber";
 import { TanstackQueryClient } from "@/component/TanstackQuery/TanstackQuery";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,7 +22,7 @@ export default function RootLayout({ children }) {
         <script src="https://cdn.tailwindcss.com"></script>
       </head>
       <body className={inter.className}>
-        <div className="">
+        <div>
           <TanstackQueryClient>{children}</TanstackQueryClient>
         </div>
       </body>

@@ -7,11 +7,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Image from "next/image";
+import { MdLogin } from "react-icons/md";
 
 const Navber = () => {
   const [allUser, setAllUser] = useState([]);
   const [user] = useAuthState(auth);
-  console.log("_user", user?.email);
+
+  // navber items
   const navitem = (
     <>
       <li>
@@ -23,29 +25,26 @@ const Navber = () => {
     </>
   );
 
+  // user data get from backend API
   const { data, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const res = await axios
         .get("https://job-task-xi.vercel.app/user")
         .then((res) => {
-          // console.log(res?.data);
           setAllUser(res?.data);
           refetch();
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch(() => {});
     },
   });
-  console.log(allUser);
+
+  // login user find
   const findUser = allUser?.find((users) => users?.email == user?.email);
-  console.log(findUser);
-  
 
   return (
     <div className="bg-[#0b4a6cde] text-white">
-      <div className="max-w-[1300px] mx-auto w-full">
+      <div className="max-w-7xl mx-auto w-full">
         <div className="navbar   ">
           <div className="navbar-start ">
             <div className="dropdown">
@@ -83,6 +82,7 @@ const Navber = () => {
           </div>
           <div className="navbar-end">
             <div className="flex items-center">
+              {/* user info in navber */}
               <div className="flex flex-row-reverse items-center">
                 <div>
                   <label
@@ -90,7 +90,6 @@ const Navber = () => {
                     className="btn btn-ghost btn-circle avatar"
                   >
                     <div className="w-10 rounded-full">
-                      {/* <img src={user?.photoURL} /> */}
                       <Image
                         src={
                           findUser?.photo ||
@@ -103,27 +102,27 @@ const Navber = () => {
                     </div>
                   </label>
                 </div>
-                <div className="">
+                <div className="pr-1">
                   <span className="text-xs md:text-lg font-bold">
                     {findUser?.name}
                   </span>
                 </div>
               </div>
-              <button className=" ">
-                {/* <LuLogOut className="text-2xl" /> */}
-              </button>
             </div>
-            {user ? (
-              <div>
-                <LogOut />
-              </div>
-            ) : (
-              <Link href="/login">
-                <button className="btn btn-sm bg-white hover:text-[#080403] text-black font-bold">
-                  Log In
-                </button>
-              </Link>
-            )}
+            {/* login and logout logic button */}
+            <div className="pl-4">
+              {user ? (
+                <div>
+                  <LogOut />
+                </div>
+              ) : (
+                <Link href="/login">
+                  <button className="btn glass btn-sm bg-white hover:text-[#ffffff] text-black font-bold">
+                    <MdLogin />
+                  </button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

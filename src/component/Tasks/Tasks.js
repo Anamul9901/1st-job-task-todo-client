@@ -1,35 +1,46 @@
 "use client";
-import Link from "next/link";
 import axios from "axios";
 import { auth } from "@/app/firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const Tasks = () => {
   const [allTask, setAllTask] = useState([]);
-  const [user] = useAuthState(auth);
-  console.log(user?.email);
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
 
-  const { data, refetch } = useQuery({
+  // get todo api data (using TanstackQuery for easy refetch)
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ["todo"],
     queryFn: async () => {
       const res = await axios
         .get("https://job-task-xi.vercel.app/todo")
         .then((res) => {
-          // console.log(res?.data);
           setAllTask(res?.data);
         })
-        .catch((err) => {
-          console.error(err);
-        });
+        .catch(() => {});
     },
   });
-//   console.log(allTask);
-  const filterTasks = allTask?.filter((task) => task?.author == user?.email);
-  console.log(filterTasks);
 
-  //  function of add task button
+  // (redirect to login)  When user trying to go tasks page without login then he redirect to login page
+  if (loading || isLoading) {
+    return (
+      <div className="flex justify-center text-center items-start pt-20 h-[100vh]">
+        <span className="loading loading-spinner text-warning"></span>
+      </div>
+    );
+  }
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
+
+  //  filter all task from todo API by login user (only user task shown)
+  const filterTasks = allTask?.filter((task) => task?.author == user?.email);
+
+  //  function of add-task button (add task of todo api)
   const handleAddTask = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -40,21 +51,19 @@ const Tasks = () => {
     const position = "to-do";
     const author = user?.email;
     form.reset();
-    // console.log(name, title, dadline, description);
     const updateData = { name, title, dadline, description, position, author };
-    console.log(updateData);
+
+    // post new task on todo API
     const res = await axios
       .post("https://job-task-xi.vercel.app/todo", updateData)
       .then((res) => {
-        console.log(res?.data);
-        refetch()
+        refetch();
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => {});
   };
 
-  //  update position
+  // Update position of Todo API tasks
+  // (position >> to-do to ongoing)
   const handleOngoing = (id) => {
     console.log(id);
     const position = "ongoing";
@@ -62,14 +71,11 @@ const Tasks = () => {
     axios
       .patch(`https://job-task-xi.vercel.app/todo/${id}`, newData)
       .then((res) => {
-        console.log(res.data);
         refetch();
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => {});
   };
-
+  //  (position >> ongoing to completed)
   const handleCompleted = (id) => {
     console.log(id);
     const position = "completed";
@@ -77,49 +83,46 @@ const Tasks = () => {
     axios
       .patch(`https://job-task-xi.vercel.app/todo/${id}`, newData)
       .then((res) => {
-        console.log(res.data);
         refetch();
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((err) => {});
   };
 
+  // Delete function of todo data (position completed to delete)
   const handleDelete = (id) => {
     console.log(id);
     axios
       .delete(`https://job-task-xi.vercel.app/todo/${id}`)
       .then((res) => {
-        console.log(res?.data);
         refetch();
       })
       .catch(() => {});
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* You can open the modal using document.getElementById('ID').showModal() method */}
+    <div className="max-w-7xl mx-auto h-screen">
+      {/* Using Modal for add task on todo API */}
       <div>
-        <div className="flex items-center justify-center pt-4">
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={() => document.getElementById("my_modal_3").showModal()}
-        >
-          Add Task
-        </button>
+        <div className="flex items-center justify-center pt-12">
+          <button
+            className="btn btn-sm glass bg-white hover:text-[#ffffff] text-black font-bold"
+            onClick={() => document.getElementById("my_modal_1").showModal()}
+          >
+            Add Task
+          </button>
         </div>
-        <dialog id="my_modal_3" className="modal">
+        <dialog id="my_modal_1" className="modal">
           <div className="modal-box">
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 glass">
                 ✕
               </button>
             </form>
             <h3 className="font-bold text-lg text-center">Add you task!</h3>
 
             <form method="dialog" onSubmit={handleAddTask}>
-              <div className="">
+              <div className="pt-6">
                 <div className="md:flex gap-5 mb-5">
                   <div className="w-full">
                     <h2>Name</h2>
@@ -165,10 +168,7 @@ const Tasks = () => {
                   </div>
                 </div>
 
-                <button
-                  type="submit"
-                  className="btn glass w-full bg-pink-500 font-bold hover:text-[#EC7755]"
-                >
+                <button className="btn text-white btn-sm hover:bg-white glass w-full bg-[#de9c33c6] font-bold hover:text-[#090909]">
                   S u b m i t
                 </button>
               </div>
@@ -176,10 +176,12 @@ const Tasks = () => {
           </div>
         </dialog>
       </div>
+      {/* Finished Modal */}
 
-      <div className="md:flex justify-between pt-10 text-black">
-        <div className="bg-red-300 flex-1 ">
-          <h2 className="text-center text-xl font-bold pb-2">To-Do</h2>
+      <div className="md:flex justify-between pt-4 text-black px-2 rounded-lg gap-2">
+        {/* All To-Do task */}
+        <div className="bg-red-300 flex-1 rounded-lg glass">
+          <h2 className="text-center text-xl font-bold py-2">To-Do</h2>
           <hr />
           <div>
             <div className="overflow-x-auto">
@@ -193,7 +195,9 @@ const Tasks = () => {
                     <th>Action</th>
                   </tr>
                 </thead>
+                {/* body */}
                 <tbody>
+                  {/* filter all task by position(to-do) then map */}
                   {filterTasks
                     ?.filter((task) => task?.position === "to-do")
                     .map((task, ind) => (
@@ -203,27 +207,14 @@ const Tasks = () => {
                         <td>{task?.dadline}</td>
                         <td>
                           <div className="flex">
-                            <div>
-                              <button className="text-xl text-red-600">
-                                {/* <AiFillDelete /> */}
-                              </button>
-                              <Link
-                                href={`/dashboard/update-task/`}
-                                className="text-xl ml-2 text-green-600"
+                            {/* Action button (Ongoing) */}
+                            <div className="pb-2">
+                              <button
+                                onClick={() => handleOngoing(task._id)}
+                                className="bg-yellow-600 rounded-md font-semibold text-white px-1"
                               >
-                                {/* <FaEdit /> */}
-                              </Link>
-                            </div>
-
-                            <div>
-                              <div className="pb-2">
-                                <button
-                                  onClick={() => handleOngoing(task._id)}
-                                  className="bg-yellow-600 rounded-md font-bold text-white px-1"
-                                >
-                                  Ongoing
-                                </button>
-                              </div>
+                                Ongoing
+                              </button>
                             </div>
                           </div>
                         </td>
@@ -235,23 +226,25 @@ const Tasks = () => {
           </div>
         </div>
 
-        <div className="bg-yellow-300 flex-1 mt-6 md:mt-0">
-          <h2 className="text-center text-xl font-bold pb-2">Ongoing</h2>
+        {/* All Ongoing task */}
+        <div className="bg-yellow-300 flex-1 mt-6 md:mt-0 rounded-lg glass">
+          <h2 className="text-center text-xl font-bold py-2">Ongoing</h2>
           <hr />
           <div>
             <div className="overflow-x-auto">
               <table className="table">
                 {/* head */}
                 <thead>
-                  <tr>
+                  <tr className="text-black">
                     <th>No.</th>
                     <th>Name</th>
                     <th>Dadline</th>
                     <th>Action</th>
                   </tr>
                 </thead>
+                {/* body */}
                 <tbody>
-                  {/* --------- */}
+                  {/* filter all task by position(ongoing) then map */}
                   {filterTasks
                     ?.filter((task) => task?.position === "ongoing")
                     .map((task, ind) => (
@@ -260,23 +253,12 @@ const Tasks = () => {
                         <td>{task.name}</td>
                         <td>{task.dadline}</td>
                         <td>
+                          {/* Acion button (Completed) */}
                           <div className="flex">
-                            <div>
-                              <button className=" text-xl text-red-600">
-                                {/* <AiFillDelete /> */}
-                              </button>
-                              <Link
-                                href={`/dashboard/update-task/`}
-                                className=" text-xl ml-2 text-green-600"
-                              >
-                                {/* <FaEdit /> */}
-                              </Link>
-                            </div>
-
                             <div>
                               <div>
                                 <button
-                                  className="bg-green-600   rounded-md font-bold text-white px-1"
+                                  className="bg-green-600   rounded-md font-semibold text-white px-1"
                                   onClick={() => handleCompleted(task._id)}
                                 >
                                   Completed
@@ -293,15 +275,16 @@ const Tasks = () => {
           </div>
         </div>
 
-        <div className="bg-green-300 flex-1 mt-6 md:mt-0">
-          <h2 className="text-center text-xl font-bold pb-2">Completed</h2>
+        {/* All completed task */}
+        <div className="bg-green-300 flex-1 mt-6 md:mt-0 rounded-lg glass">
+          <h2 className="text-center text-xl font-bold py-2">Completed</h2>
           <hr />
           <div>
             <div className="overflow-x-auto">
               <table className="table">
                 {/* head */}
                 <thead>
-                  <tr>
+                  <tr className="text-black">
                     <th>No.</th>
                     <th>Name</th>
                     <th>Dadline</th>
@@ -309,6 +292,7 @@ const Tasks = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {/* filter all task by position(completed) then map */}
                   {filterTasks
                     ?.filter((task) => task?.position === "completed")
                     .map((task, ind) => (
@@ -317,28 +301,15 @@ const Tasks = () => {
                         <td>{task.name}</td>
                         <td>{task.dadline}</td>
                         <td>
+                          {/* Action button (delete) */}
                           <div className="flex">
-                            <div>
-                              <button className=" text-xl text-red-600">
-                                {/* <AiFillDelete /> */}
-                              </button>
-                              <Link
-                                href={`/dashboard/update-task/`}
-                                className=" text-xl ml-2 text-green-600"
+                            <div className="pb-2">
+                              <button
+                                className="bg-red-600 rounded-md font-semibold text-white px-1"
+                                onClick={() => handleDelete(task._id)}
                               >
-                                {/* <FaEdit /> */}
-                              </Link>
-                            </div>
-
-                            <div>
-                              <div className="pb-2">
-                                <button
-                                  className="bg-red-600   rounded-md font-bold text-white px-1"
-                                  onClick={() => handleDelete(task._id)}
-                                >
-                                  Delete
-                                </button>
-                              </div>
+                                Delete
+                              </button>
                             </div>
                           </div>
                         </td>
