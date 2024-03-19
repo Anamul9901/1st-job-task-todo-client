@@ -65,7 +65,6 @@ const Tasks = () => {
   // Update position of Todo API tasks
   // (position >> to-do to ongoing)
   const handleOngoing = (id) => {
-    console.log(id);
     const position = "ongoing";
     const newData = { position };
     axios
@@ -77,7 +76,6 @@ const Tasks = () => {
   };
   //  (position >> ongoing to completed)
   const handleCompleted = (id) => {
-    console.log(id);
     const position = "completed";
     const newData = { position };
     axios
@@ -90,7 +88,6 @@ const Tasks = () => {
 
   // Delete function of todo data (position completed to delete)
   const handleDelete = (id) => {
-    console.log(id);
     axios
       .delete(`https://job-task-xi.vercel.app/todo/${id}`)
       .then((res) => {

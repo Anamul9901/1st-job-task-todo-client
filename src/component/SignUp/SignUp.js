@@ -17,26 +17,26 @@ const SignUp = () => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
-    // const photo = form.image.value;
     const email = form.email.value;
     const password = form.password.value;
+
     const image = form.photo.files[0];
     const imageData = await UploadImage(image);
     const photo = imageData?.data?.display_url;
 
     const user = { name, email, photo };
-    console.log(user);
 
     try {
       const res = await createUserWithEmailAndPassword(email, password);
-      console.log({ res });
       router.push("/");
 
       // user data post on server api when register
       axios
         .post("https://job-task-xi.vercel.app/user", user)
-        .then(() => {})
-        .catch(() => {});
+        .then((res) => {
+        })
+        .catch((err) => {
+        });
     } catch {}
   };
 
