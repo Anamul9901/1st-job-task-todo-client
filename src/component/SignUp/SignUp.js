@@ -14,17 +14,24 @@ const SignUp = () => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
-    const image = form.image.value;
+    const photo = form.image.value;
     const email = form.email.value;
     const password = form.password.value;
-    console.log(name, email, password, image);
-    const user = { name, email, image };
+    console.log(name, email, password, photo);
+    const user = { name, email, photo };
 
     try {
       const res = await createUserWithEmailAndPassword(email, password);
       console.log({ res });
       router.push("/");
-     
+      axios
+        .post("https://job-task-xi.vercel.app/user", user)
+        .then(() => {
+          console.log(data.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     } catch (err) {
       console.error(err);
     }

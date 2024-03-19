@@ -5,7 +5,10 @@ export const metadata = {
   description: "Jobe tasks",
 };
 const Layout = ({ children }) => {
-  return <div>{children}</div>;
+  return <div>
+    
+    {children}
+  </div>;
 };
 
 export default Layout;

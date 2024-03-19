@@ -2,6 +2,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navber from "@/component/Navber/Navber";
+import { TanstackQueryClient } from "@/component/TanstackQuery/TanstackQuery";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <div className="max-w-7xl mx-auto">
-        {children}
+          <TanstackQueryClient>{children}</TanstackQueryClient>
         </div>
       </body>
     </html>
