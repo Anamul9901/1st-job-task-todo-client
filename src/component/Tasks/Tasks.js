@@ -11,35 +11,6 @@ const Tasks = () => {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
 
-  // get todo api data (using TanstackQuery for easy refetch)
-  const { data, refetch, isLoading } = useQuery({
-    queryKey: ["todo"],
-    queryFn: async () => {
-      const res = await axios
-        .get("https://job-task-xi.vercel.app/todo")
-        .then((res) => {
-          setAllTask(res?.data);
-        })
-        .catch(() => {});
-    },
-  });
-
-  // (redirect to login)  When user trying to go tasks page without login then he redirect to login page
-  if (loading || isLoading) {
-    return (
-      <div className="flex justify-center text-center items-start pt-20 h-[100vh]">
-        <span className="loading loading-spinner text-warning"></span>
-      </div>
-    );
-  }
-  if (!user) {
-    router.push("/login");
-    return null;
-  }
-
-  //  filter all task from todo API by login user (only user task shown)
-  const filterTasks = allTask?.filter((task) => task?.author == user?.email);
-
   //  function of add-task button (add task of todo api)
   const handleAddTask = async (e) => {
     e.preventDefault();
@@ -61,6 +32,35 @@ const Tasks = () => {
       })
       .catch((err) => {});
   };
+
+  // get todo api data (using TanstackQuery for easy refetch)
+  const { data, refetch } = useQuery({
+    queryKey: ["todo"],
+    queryFn: async () => {
+      const res = await axios
+        .get("https://job-task-xi.vercel.app/todo")
+        .then((res) => {
+          setAllTask(res?.data);
+        })
+        .catch(() => {});
+    },
+  });
+
+  // (redirect to login)  When user trying to go tasks page without login then he redirect to login page
+  if (loading) {
+    return (
+      <div className="flex justify-center text-center items-start pt-20 h-[100vh]">
+        <span className="loading loading-spinner text-warning"></span>
+      </div>
+    );
+  }
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
+
+  //  filter all task from todo API by login user (only user task shown)
+  const filterTasks = allTask?.filter((task) => task?.author == user?.email);
 
   // Update position of Todo API tasks
   // (position >> to-do to ongoing)
