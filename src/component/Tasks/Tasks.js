@@ -5,6 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Tasks = () => {
   const [allTask, setAllTask] = useState([]);
@@ -28,9 +29,12 @@ const Tasks = () => {
     const res = await axios
       .post("https://job-task-xi.vercel.app/todo", updateData)
       .then((res) => {
+        toast.success("Task added");
         refetch();
       })
-      .catch((err) => {});
+      .catch((err) => {
+        toast.error("There is a problem");
+      });
   };
 
   // get todo api data (using TanstackQuery for easy refetch)
@@ -55,6 +59,7 @@ const Tasks = () => {
     );
   }
   if (!user) {
+    toast.success("Login Required");
     router.push("/login");
     return null;
   }
@@ -71,6 +76,7 @@ const Tasks = () => {
       .patch(`https://job-task-xi.vercel.app/todo/${id}`, newData)
       .then((res) => {
         refetch();
+        toast.success("To-Do to Ongoing");
       })
       .catch((err) => {});
   };
@@ -82,6 +88,7 @@ const Tasks = () => {
       .patch(`https://job-task-xi.vercel.app/todo/${id}`, newData)
       .then((res) => {
         refetch();
+        toast.success("Ongoing to Completed");
       })
       .catch((err) => {});
   };
@@ -92,6 +99,7 @@ const Tasks = () => {
       .delete(`https://job-task-xi.vercel.app/todo/${id}`)
       .then((res) => {
         refetch();
+        toast.success("Task Deleted");
       })
       .catch(() => {});
   };

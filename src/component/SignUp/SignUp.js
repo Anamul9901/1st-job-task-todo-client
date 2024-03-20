@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import axios from "axios";
 import { UploadImage } from "../PhotoFile/utilites";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
   const [createUserWithEmailAndPassword] =
@@ -28,16 +29,24 @@ const SignUp = () => {
 
     try {
       const res = await createUserWithEmailAndPassword(email, password);
-      router.push("/");
 
       // user data post on server api when register
-      axios
-        .post("https://job-task-xi.vercel.app/user", user)
-        .then((res) => {
-        })
-        .catch((err) => {
-        });
-    } catch {}
+      if (res) {
+        axios
+          .post("https://job-task-xi.vercel.app/user", user)
+          .then((res) => {
+            router.push("/");
+            toast.success("SignUp Successful");
+          })
+          .catch((err) => {
+            toast.error(err);
+          });
+      } else {
+        toast.error("Something is wrong");
+      }
+    } catch {
+      toast.error("Something is wrong");
+    }
   };
 
   return (

@@ -41,7 +41,7 @@ const Home = () => {
 
 
       {/* Why TASKMASTER? section */}
-      <div className="flex justify-center items-center pt-6 pb-20 px-1">
+      <div className="flex justify-center items-center pt-6 pb-12 px-1">
         <div className="md:flex justify-around items-center gap-10 bg-gray-700 pb-20 w-full h-[550px] rounded-lg ">
           <div className="flex justify-center items-center pt-10">
             <Image

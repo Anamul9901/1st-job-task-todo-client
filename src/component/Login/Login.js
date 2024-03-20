@@ -3,6 +3,7 @@ import { auth } from "@/app/firebase/config";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
@@ -17,8 +18,15 @@ const Login = () => {
 
     try {
       const res = await signInWithEmailAndPassword(email, password);
-      router.push("/");
-    } catch {}
+      if (res) {
+        router.push("/");
+        toast.success("Login Successful");
+      } else {
+        toast.error("Email & Password Incorrect");
+      }
+    } catch {
+      toast.error("Email & Password Incorrect");
+    }
   };
 
   return (
